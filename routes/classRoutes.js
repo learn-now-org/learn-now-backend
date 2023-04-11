@@ -14,6 +14,34 @@ const classModel = require("../models/classModel");
 const router = express.Router();
 
 
+
+
+router.get("/search", async (req, res) => {
+    try {
+        const result = await classModel.aggregate([
+            {
+                $search: {
+                    "autocomplete": {
+                        "query": req.query.query,
+                        "path": "name",
+                        "fuzzy": {
+                            "maxEdits": 2,
+                            "maxExpansions": 100
+                        }
+                    }
+                }
+            },
+            {
+              $limit: 10
+            }
+        ]);
+        res.json(result);
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+}
+);
+
 /**
  * GET /classes
  * @summary Gets all the classes in the database
@@ -289,6 +317,60 @@ async function getClass(req, res, next) {
     next();
 }
 
+/**
+ * POST /classes/batch-data
+ * @description Creates multiple class object from a JSON array
+ * @summary Creates multiple class objects from a JSON array of class objects
+ * @param {requestBodyType} request.body.required - Body of the request containing the JSON array of class objects
+ * @return {responseType} 201 - Success response
+ * @return {responseType} 400 - Bad request
+ * @example request - example payload
+ * [
+ * {
+ * "name": "Data Structures",
+ * "description": "Data Structures in C++ and Python",
+ * "number": "EN.605.202",
+ * "section": "02",
+ * "term": "Fall 2022",
+ *  "instructor": "Dr. Jane Smith"
+ * },
+ * {
+ * "name": "Algorithms",
+ * "description": "Algorithms in C++ and Python",
+ * "number": "EN.605.203",
+ * "section": "02",
+ * "term": "Fall 2022",
+ * "instructor": "Dr. Jane Smith"
+ * }
+ * ]
+ * @example response - 201 - example success response
+ * [
+ * {
+ * "name": "Data Structures",
+ * "description": "Data Structures in C++ and Python",
+ * "number": "EN.605.202",
+ * "section": "02",
+ * "term": "Fall 2022",
+ * "instructor": "Dr. Jane Smith"
+ * },
+ * {
+ * "name": "Algorithms",
+ * "description": "Algorithms in C++ and Python",
+ * "number": "EN.605.203",
+ * "section": "02",
+ * "term": "Fall 2022",
+ * "instructor": "Dr. Jane Smith"
+ * }
+ * ]
+ * @example response - 400 - example bad request response
+ * {
+ *  "message": "Invalid class ID"
+ * }
+ * @example response - 500 - example error response
+ * {
+ * "message": "Internal server error"
+ * }
+ */
 router.post("/batch-data", async (req, res) => {
   const objects = [];
   for (let i = 0; i < req.body.length; i++) {
@@ -311,14 +393,4 @@ router.post("/batch-data", async (req, res) => {
     res.status(400).json({ message: err.message });
   }
 });
-
-router.post("/delete-all", async (req, res) => {
-  try {
-    const deleted = await classModel.deleteMany({});
-    res.status(200).json(deleted);
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
-});
-
 module.exports = router;

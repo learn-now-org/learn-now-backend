@@ -1,7 +1,5 @@
 const express = require('express');
 const app = express();
-<<<<<<< Updated upstream
-=======
 
 const expressJSDocSwagger = require('express-jsdoc-swagger');
 const path = require('path');
@@ -58,7 +56,6 @@ app.use('/public', express.static(path.join(__dirname, 'public')));
 
 expressJSDocSwagger(app)(options);
 
->>>>>>> Stashed changes
 const cors = require("cors");
 const helmet = require("helmet");
 require("dotenv").config({ path: "./.env" })
@@ -101,32 +98,5 @@ app.use((err, req, res, next) => {
 app.get("/", (req, res) => {
     res.send("Welcome to the Learn Now API!");
 }); 
-<<<<<<< Updated upstream
-  
-=======
 
-const axios = require("axios");
-
-app.get("/refresh", async (req, res) => {
-  const SIS_API_KEY = process.env.SIS_API_KEY;
-  const baseURL = "https://sis.jhu.edu/api";
-  const getAllSchools = `${baseURL}/classes/codes/schools?key=${SIS_API_KEY}`;
-  try {
-    const response = await axios.get(getAllSchools);
-    const schools = response.data;
-    // For each school, get all the classes with /classes/{school}?key=apikeyvalue
-    for (let i = 0; i < schools.length; i++) {
-      const school = schools[i].Name;
-      const getAllClasses = `${baseURL}/classes/${school}?key=${SIS_API_KEY}`;
-      const response = await axios.get(getAllClasses);
-      const classes = response.data;
-    }
-  } catch (err) {
-    console.log(err);
-  }
-});
-
-
-
->>>>>>> Stashed changes
 module.exports = app;
