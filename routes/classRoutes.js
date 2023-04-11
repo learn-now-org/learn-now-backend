@@ -1,51 +1,51 @@
 /**
- * @swagger
- * components:
- *   schemas:
- *     Class:
- *       type: object
- *       required:
- *         - name
- *         - number
- *         - section
- *         - semester
- *         - year
- *       properties:
- *         name:
- *           type: string
- *           description: The name of the class (as defined by SIS)
- *         description:
- *           type: string
- *           description: The description of the class (as defined by SIS)
- *         number:
- *           type: string
- *           description: The number of the class (as defined by SIS). DOES NOT include the section number.
- *         section:
- *           type: string
- *           description: The section number of the class (as defined by SIS). DOES NOT include the class number.
- *         semester:
- *           type: string
- *           description: The semester of the class (as defined by SIS).
- *         year:
- *           type: number
- *           description: The year of the class (as defined by SIS).
- *         instructor:
- *           type: string
- *           description: The name of the instructor of the class.
- *       example:
- *         name: Organic Chemistry I
- *         description: This is a course for students who want to learn the basics of organic chemistry.
- *         number: EN.101.101
- *         section: 01
- *         semester: Fall
- *         year: 2020
- *         instructor: Aayush Gandhi
+ * Class model
+ * @typedef {object} Class
+ * @property {string} name.required - The name of the class (as defined by SIS)
+ * @property {string} description - The description of the class (as defined by SIS)
+ * @property {string} number.required - The number of the class (as defined by SIS). DOES NOT include the section number.
+ * @property {string} section.required - The section number of the class (as defined by SIS). DOES NOT include the class number.
+ * @property {string} semester.required - The semester of the class (as defined by SIS).
+ * @property {number} year.required - The year of the class (as defined by SIS).
+ * @property {string} instructor - The name of the instructor of the class.
  */
 
 const express = require("express");
 const classModel = require("../models/classModel");
 const router = express.Router();
 
+
+/**
+ * GET /classes
+ * @summary Gets all the classes in the database
+ * @tags Classes
+ * @return {object} 200 - Success response
+ * @return {object} 500 - Server error
+ * @example request - example payload
+ * {
+ *  "name": "Data Structures",
+ *  "description": "Data Structures in C++",
+ *  "number": "EN.605.202",
+ * "section": "01",
+ * "semester": "Spring",
+ * "year": 2021,
+ * "instructor": "Dr. John Doe"
+ * }
+ * @example response - 200 - example success response
+ * {
+ * "name": "Data Structures",
+ * "description": "Data Structures in C++",
+ * "number": "EN.605.202",
+ * "section": "01",
+ *  "semester": "Spring",
+ * "year": 2021,
+ * "instructor": "Dr. John Doe"
+ * }
+ * @example response - 500 - example error response
+ * {
+ *  "message": "Internal server error"
+ * }
+ */
 router.get("/", async (req, res) => {
   try {
     const classes = await classModel.find();
@@ -55,10 +55,82 @@ router.get("/", async (req, res) => {
   }
 });
 
+
+/**
+ * GET /classes/{id}
+ * @summary Gets the class with the specified ID
+ * @tags Classes
+ * @param {string} id.path - The ID of the class to retrieve
+ * @return {object} 200 - Success response
+ * @return {object} 404 - Class Not Found Error
+ * @return {object} 500 - Server error
+ * @example response - 200 - example success response
+ * {
+ * "name": "Data Structures",
+ * "description": "Data Structures in C++",
+ * "number": "EN.605.202",
+ * "section": "01",
+ *  "semester": "Spring",
+ * "year": 2021,
+ * "instructor": "Dr. John Doe"
+ * }
+ * @example response - 404 - example not found error response
+ * {
+ *  "message": "Cannot find class"
+ * }
+ * @example response - 500 - example server error response
+ * {
+ *  "message": "Internal server error"
+ * }
+ */
 router.get("/:id", getClass, (req, res) => {
   res.json(res.class);
 });
 
+/**
+ * POST /classes
+ * @summary Create a new class
+ * @tags Classes
+ * @param {object} request.body.required - The class information.
+ * @property {string} request.body.name.required - The name of the class.
+ * @property {string} request.body.description.required - The description of the class.
+ * @property {string} request.body.number.required - The class number.
+ * @property {string} request.body.section.required - The section number of the class.
+ * @property {string} request.body.semester.required - The semester of the class.
+ * @property {number} request.body.year.required - The year of the class.
+ * @property {string} request.body.instructor.required - The name of the instructor for the class.
+ * @return {object} 201 - The newly created class
+ * @return {object} 400 - Bad request
+ * @return {object} 500 - Server error
+ * @example request - example payload
+ * {
+ *  "name": "Data Structures",
+ *  "description": "Data Structures in C++",
+ *  "number": "EN.605.202",
+ *  "section": "01",
+ *  "semester": "Spring",
+ *  "year": 2021,
+ *  "instructor": "Dr. John Doe"
+ * }
+ * @example response - 201 - example success response
+ * {
+ *  "name": "Data Structures",
+ *  "description": "Data Structures in C++",
+ *  "number": "EN.605.202",
+ *  "section": "01",
+ *  "semester": "Spring",
+ *  "year": 2021,
+ *  "instructor": "Dr. John Doe"
+ * }
+ * @example response - 400 - example error response
+ * {
+ *  "message": "Bad request"
+ * }
+ * @example response - 500 - example error response
+ * {
+ *  "message": "Internal server error"
+ * }
+ */
 router.post("/", async (req, res) => {
   const classObject = new classModel({
     name: req.body.name,
@@ -77,6 +149,44 @@ router.post("/", async (req, res) => {
   }
 });
 
+/**
+ * PATCH /classes/{id}
+ * @summary Update a class by ID
+ * @tags Classes
+ * @param {string} id.path.required - The ID of the class to update
+ * @param {object} request.body.required - The updated class information
+ * @return {object} 200 - Success response
+ * @return {object} 404 - Class not found error
+ * @return {object} 500 - Server error
+ * @example request - example payload
+ * {
+ *  "name": "Data Structures",
+ *  "description": "Data Structures in C++ and Python",
+ *  "number": "EN.605.202",
+ * "section": "02",
+ * "semester": "Fall",
+ * "year": 2022,
+ * "instructor": "Dr. Jane Smith"
+ * }
+ * @example response - 200 - example success response
+ * {
+ * "name": "Data Structures",
+ * "description": "Data Structures in C++ and Python",
+ * "number": "EN.605.202",
+ * "section": "02",
+ *  "semester": "Fall",
+ * "year": 2022,
+ * "instructor": "Dr. Jane Smith"
+ * }
+ * @example response - 404 - example error response
+ * {
+ *  "message": "Class not found"
+ * }
+ * @example response - 500 - example error response
+ * {
+ *  "message": "Internal server error"
+ * }
+ */
 router.patch("/:id", getClass, async (req, res) => {
   if (req.body.name == null) {
     return res.status(400).json({ message: "Name is required" });
@@ -122,6 +232,34 @@ router.patch("/:id", getClass, async (req, res) => {
   }
 });
 
+/**
+ * DELETE /classes/{id}
+ * @summary Deletes a class by ID
+ * @tags Classes
+ * @param {string} id.path - ID of the class to delete
+ * @return {object} 200 - Success response
+ * @return {object} 404 - Class not found
+ * @return {object} 500 - Server error
+ * @example response - 200 - example success response
+ * {
+ * "name": "Data Structures",
+ * "description": "Data Structures in C++ and Python",
+ * "number": "EN.605.202",
+ * "section": "02",
+ *  "semester": "Fall",
+ * "year": 2022,
+ * "instructor": "Dr. Jane Smith"
+ * }
+ * @example response - 404 - example not found response
+ * {
+ *   "error": "Invalid class ID"
+ * }
+ *
+ * @example response - 500 - example error response
+ * {
+ *   "message": "Internal server error"
+ * }
+ */
 router.delete("/:id", async (req, res) => {
   try {
     const classMade = await classModel.findByIdAndRemove(req.params.id);

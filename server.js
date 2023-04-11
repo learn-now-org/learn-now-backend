@@ -5,20 +5,59 @@ const app = express();
 const bodyParser = require("body-parser");
 const swaggerJsdoc = require("swagger-jsdoc");
 const swaggerUi = require("swagger-ui-express");
-
-const swaggerDefinition = require("./swagger.json");
+const expressJSDocSwagger = require('express-jsdoc-swagger');
+const path = require('path');
 
 const options = {
-  swaggerDefinition,
-  apis: ['./routes/*.js'],
+  openapi: "3.0.1",
+  swagger: "2.0",
+  info: {
+    version: '1.0.0',
+    title: 'Learn Now API Documentation',
+    description: "Documentation for the Learn Now API. This API is used to manage students, tutors, classes, and schools for the Learn Now application.",
+    license: {
+      name: 'MIT',
+      url: 'https://spdx.org/licenses/MIT.html',
+    },
+    contact: {
+      name: 'Aayush Gandhi',
+      url: 'https://github.com/learn-now-org/learn-now-backend',
+      email: 'aayushgandhi2001@gmail.com',
+    },
+    termsOfService: 'https://github.com/learn-now-org/learn-now-backend',
+  },
+  servers: [
+    {
+      url: 'http://localhost:5000',
+      description: 'Development server',
+    },
+    {
+      url: "https://learn-now-backend.vercel.app/",
+      description: "Production server",
+    }
+      
+  ],
+  filesPattern: './routes/*.js',
+  baseDir: __dirname,
+  // URL where SwaggerUI will be rendered
+  swaggerUIPath: '/docs',
+  // Expose OpenAPI UI
+  exposeSwaggerUI: true,
+  // Expose Open API JSON Docs documentation in `apiDocsPath` path.
+  exposeApiDocs: false,
+  // Open API JSON Docs endpoint.
+  apiDocsPath: '/v3/api-docs',
+  // Set non-required fields as nullable by default
+  notRequiredAsNullable: false,
+  swaggerUiOptions: {
+    customCssUrl: '/public/swagger-ui.css', 
+    customSiteTitle: "Learn Now API Documentation",
+  },
 };
 
-const specs = swaggerJsdoc(options);
-app.use(
-  "/docs",
-  swaggerUi.serve,
-  swaggerUi.setup(specs, { explorer: true })
-);
+app.use('/public', express.static(path.join(__dirname, 'public')));
+
+expressJSDocSwagger(app)(options);
 
 const cors = require("cors");
 const helmet = require("helmet");
@@ -62,5 +101,5 @@ app.use((err, req, res, next) => {
 app.get("/", (req, res) => {
     res.send("Welcome to the Learn Now API!");
 }); 
-  
+
 module.exports = app;
