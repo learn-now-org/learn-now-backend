@@ -18,6 +18,12 @@ router.get("/:id", getTutor, (req, res) => {
 );
 
 router.post("/", async (req, res) => {
+    if (req.body.name == null) {
+        return res.status(400).json({ message: "Name is required" });
+    }
+    if (req.body.email == null) {
+        return res.status(400).json({ message: "Email is required" });
+    }
     const tutor = new tutorModel({
         name: req.body.name,
         email: req.body.email,
@@ -59,11 +65,17 @@ router.patch("/:id", getTutor, async (req, res) => {
 }
 );
 
-router.delete("/:id", getTutor, async (req, res) => {
+router.delete("/:id", async (req, res) => {
     try {
-        await res.tutor.remove();
-        res.json({ message: "Deleted Tutor" });
+        const tutor = await tutorModel.findByIdAndRemove(req.params.id);
+        if (tutor == null) {
+            return res.status(404).json({ message: "Cannot find tutor" });
+        }
+        res.json(tutor);
     } catch (err) {
+        if (err.name == "CastError") {
+            return res.status(404).json({ message: "Cannot find tutor" });
+        }
         res.status(500).json({ message: err.message });
     }
 }
@@ -77,6 +89,9 @@ async function getTutor(req, res, next) {
             return res.status(404).json({ message: "Cannot find tutor" });
         }
     } catch (err) {
+        if (err.name == "CastError") {
+            return res.status(404).json({ message: "Cannot find tutor" });
+        }
         return res.status(500).json({ message: err.message });
     }
     res.tutor = tutor;
