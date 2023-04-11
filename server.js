@@ -10,7 +10,7 @@ app.use(express.json());
 
 const port = process.env.PORT || 5000;
 
-const uri = process.env.ATLAS_URI;
+const uri = process.env.NODE_ENV === "test" ? process.env.TEST_URI : process.env.ATLAS_URI;
 require("./db").connect(uri);
 
 const studentRoutes = require("./routes/studentRoutes");
