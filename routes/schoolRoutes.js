@@ -33,6 +33,9 @@ router.post("/", async (req, res) => {
 );
 
 router.patch("/:id", getSchool, async (req, res) => {
+    if (req.body.name == null) {
+        return res.status(400).json({ message: "Name is required" });
+    }
     if (req.body.name != null) {
         res.school.name = req.body.name;
     }
@@ -48,11 +51,17 @@ router.patch("/:id", getSchool, async (req, res) => {
 }
 );
 
-router.delete("/:id", getSchool, async (req, res) => {
+router.delete("/:id", async (req, res) => {
     try {
-        await res.school.remove();
-        res.json({ message: "Deleted School" });
+        const schoolMade = await schoolModel.findByIdAndRemove(req.params.id);
+        if (schoolMade == null) {
+            return res.status(404).json({ message: "Cannot find school" });
+        }
+        res.json(schoolMade);
     } catch (err) {
+        if (err.name === "CastError") {
+            return res.status(404).json({ message: "Cannot find school" });
+        }
         res.status(500).json({ message: err.message });
     }
 }
@@ -66,6 +75,9 @@ async function getSchool(req, res, next) {
             return res.status(404).json({ message: "Cannot find school" });
         }
     } catch (err) {
+        if (err.name === "CastError") {
+            return res.status(404).json({ message: "Cannot find school" });
+        }
         return res.status(500).json({ message: err.message });
     }
     res.school = school;

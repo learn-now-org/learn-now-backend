@@ -40,6 +40,7 @@ describe('Tutor API Test', () => {
         const response = await supertest(app).get('/tutors');
         expect(response.status).toBe(200);
         expect(response.body.length).toBe(numTests);
+        
     }
     );
 
@@ -49,6 +50,7 @@ describe('Tutor API Test', () => {
         const response2 = await supertest(app).get(`/tutors/${tutor._id}`);
         expect(response2.status).toBe(200);
         expect(response2.body).toEqual(tutor);
+        
     }
     );
 
@@ -67,6 +69,7 @@ describe('Tutor API Test', () => {
         expect(response.body.phone).toBe(tutor.phone);
         expect(response.body.classes).toEqual(tutor.classes);
         expect(response.body.rating).toBe(tutor.rating);
+        
     }
     );
 
@@ -76,6 +79,7 @@ describe('Tutor API Test', () => {
         const response2 = await supertest(app).patch(`/tutors/${tutor._id}`).send({ name: 'New Name' });
         expect(response2.status).toBe(200);
         expect(response2.body.name).toBe('New Name');
+        
     }   
     );
 
@@ -88,24 +92,29 @@ describe('Tutor API Test', () => {
         expect(response2.body.email).toBe(tutor.email);
         expect(response2.body.phone).toBe(tutor.phone);
         expect(response2.body.classes).toEqual(tutor.classes);
+        expect(response2.body.rating).toBe(tutor.rating);
+        
     }
     );
 
     it('should return 404 for invalid tutor id', async () => {
         const response = await supertest(app).get('/tutors/123');
         expect(response.status).toBe(404);
+        
     }
     );
 
     it('should return 404 for invalid tutor id on update', async () => {
         const response = await supertest(app).patch('/tutors/123').send({ name: 'New Name' });
         expect(response.status).toBe(404);
+        
     }
     );
 
     it('should return 404 for invalid tutor id on delete', async () => {
         const response = await supertest(app).delete('/tutors/123');
         expect(response.status).toBe(404);
+        
     }
     );
 
@@ -117,6 +126,7 @@ describe('Tutor API Test', () => {
         };
         const response = await supertest(app).post('/tutors').send(tutor);
         expect(response.status).toBe(400);
+        
     }
     );
 
@@ -128,6 +138,7 @@ describe('Tutor API Test', () => {
         };
         const response = await supertest(app).post('/tutors').send(tutor);
         expect(response.status).toBe(400);
+        
     }
     );
 }

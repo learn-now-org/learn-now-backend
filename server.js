@@ -23,9 +23,10 @@ app.use("/tutors", tutorRoutes);
 app.use("/classes", classRoutes);
 app.use("/schools", schoolRoutes);
 
-app.listen(port, () => {
-  console.log(`Server is running on port: ${port}`);
-});
+if (process.env.NODE_ENV !== 'test') {
+  app.listen(port, () => console.log(`Listening on port ${port}`)
+  );
+}
 
 app.use((err, req, res, next) => {
   if (err) {

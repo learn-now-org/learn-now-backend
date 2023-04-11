@@ -2,38 +2,6 @@ const express = require("express");
 const classModel = require("../models/classModel");
 const router = express.Router();
 
-// This is class Schema
-// const classSchema = new mongoose.Schema({
-//     name: {
-//         type: String,
-//         required: true,
-//     },
-//     description: {
-//         type: String,
-//         required: false,
-//     },
-//     number : {
-//         type: String,
-//         required: true,
-//     },
-//     section : {
-//         type: String,
-//         required: true,
-//     },
-//     semester : {
-//         type: String,
-//         required: true,
-//     },
-//     year : {
-//         type: Number,
-//         required: true,
-//     },  
-//     instructor : {
-//         type: String,
-//         required: false,
-//     },
-// });
-
 router.get("/", async (req, res) => {
     try {
         const classes = await classModel.find();
@@ -70,6 +38,21 @@ router.post("/", async (req, res) => {
 );
 
 router.patch("/:id", getClass, async (req, res) => {
+    if (req.body.name == null) {
+        return res.status(400).json({ message: "Name is required" });
+    }
+    if (req.body.number == null) {
+        return res.status(400).json({ message: "Number is required" });
+    }
+    if (req.body.section == null) {
+        return res.status(400).json({ message: "Section is required" });
+    }
+    if (req.body.semester == null) {
+        return res.status(400).json({ message: "Semester is required" });
+    }
+    if (req.body.year == null) {
+        return res.status(400).json({ message: "Year is required" });
+    }
     if (req.body.name != null) {
         res.class.name = req.body.name;
     }
@@ -100,11 +83,17 @@ router.patch("/:id", getClass, async (req, res) => {
 }
 );
 
-router.delete("/:id", getClass, async (req, res) => {
+router.delete("/:id", async (req, res) => {
     try {
-        await res.class.remove();
-        res.json({ message: "Deleted Class" });
+        const classMade = await classModel.findByIdAndRemove(req.params.id);
+        if (classMade == null) {
+            return res.status(404).json({ message: "Cannot find class" });
+        }
+        res.json(classMade);    
     } catch (err) {
+        if (err.name === "CastError") {
+            return res.status(404).json({ message: "Invalid class ID" });
+        }
         res.status(500).json({ message: err.message });
     }
 }
@@ -118,6 +107,9 @@ async function getClass(req, res, next) {
             return res.status(404).json({ message: "Cannot find class" });
         }
     } catch (err) {
+        if (err.name === "CastError") {
+            return res.status(404).json({ message: "Invalid class ID" });
+        }
         return res.status(500).json({ message: err.message });
     }
     res.class = classObject;

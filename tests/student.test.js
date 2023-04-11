@@ -39,6 +39,7 @@ describe('Student API Test', () => {
         const response = await supertest(app).get('/students');
         expect(response.status).toBe(200);
         expect(response.body.length).toBe(numTests);
+        
     }
     );
 
@@ -48,6 +49,7 @@ describe('Student API Test', () => {
         const response2 = await supertest(app).get(`/students/${student._id}`);
         expect(response2.status).toBe(200);
         expect(response2.body).toEqual(student);
+        
     }
     );
 
@@ -64,6 +66,7 @@ describe('Student API Test', () => {
         expect(response.body.email).toBe(student.email);
         expect(response.body.phone).toBe(student.phone);
         expect(response.body.classes).toEqual(student.classes);
+        
     }
     );
 
@@ -73,6 +76,7 @@ describe('Student API Test', () => {
         const response2 = await supertest(app).patch(`/students/${student._id}`).send({ name: 'new name' });
         expect(response2.status).toBe(200);
         expect(response2.body.name).toBe('new name');
+        
     }
     );
 
@@ -82,24 +86,31 @@ describe('Student API Test', () => {
         const response2 = await supertest(app).delete(`/students/${student._id}`);
         expect(response2.status).toBe(200);
         expect(response2.body.name).toBe(student.name);
+        expect(response2.body.email).toBe(student.email);
+        expect(response2.body.phone).toBe(student.phone);
+        expect(response2.body.classes).toEqual(student.classes);
+        
     }
     );
 
     it('should return 404 for invalid student id', async () => {
         const response = await supertest(app).get('/students/123');
         expect(response.status).toBe(404);
+        
     }
     );
 
     it('should return 404 for invalid student id on update', async () => {
         const response = await supertest(app).patch('/students/123').send({ name: 'new name' });
         expect(response.status).toBe(404);
+        
     }
     );
 
     it('should return 404 for invalid student id on delete', async () => {
         const response = await supertest(app).delete('/students/123');
         expect(response.status).toBe(404);
+        
     }
     );
 
@@ -111,6 +122,7 @@ describe('Student API Test', () => {
         };
         const response = await supertest(app).post('/students').send(student);
         expect(response.status).toBe(400);
+        
     }
     );
 
@@ -122,6 +134,7 @@ describe('Student API Test', () => {
         };
         const response = await supertest(app).post('/students').send(student);
         expect(response.status).toBe(400);
+        
     }
     );
 }
