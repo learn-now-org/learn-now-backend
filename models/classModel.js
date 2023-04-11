@@ -17,14 +17,10 @@ const classSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
-    semester : {
+    term : {
         type: String,
         required: true,
     },
-    year : {
-        type: Number,
-        required: true,
-    },  
     instructor : {
         type: String,
         required: false,
