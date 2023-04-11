@@ -1,13 +1,34 @@
-name: Vercel Production Deployment
+name: Deployment CI/CD  
+
 env:
+  SIS_API_KEY: ${{ secrets.SIS_API_KEY }}
+  MONGO_USERNAME: ${{ secrets.MONGO_USERNAME }}
+  MONGO_PASSWORD: ${{ secrets.MONGO_PASSWORD }}
+  ATLAS_URI: ${{ secrets.ATLAS_URI }}
+  PORT: ${{ secrets.PORT }}
+  TEST_URI: ${{ secrets.TEST_URI }}
   VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
   VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+  
 on:
   push:
     branches:
       - main
+
 jobs:
-  Deploy-Production:
+  Run-Unit-Tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16
+          cache: 'npm'
+      - run: npm ci
+      - run: npm test
+
+  Deploy-Dev:
+    needs: Run-Unit-Tests
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
