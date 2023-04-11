@@ -5,8 +5,17 @@ require("dotenv").config("./.env");
 const SIS_API_KEY = process.env.SIS_API_KEY;
 const baseURL = "https://sis.jhu.edu/api/classes";
 
-const refreshClassList = async () => {
+async function refreshClassList() {
     try {
+        axios.delete("http://localhost:5000/classes/delete-all")
+            .then((res) => {
+                console.log(`Finished deleting all classes with status ${res.status}`);
+            })
+            .catch((err) => {
+                console.log(err);
+                console.log(err.response);
+            }
+        );
         const allSchoolsURL = `${baseURL}/codes/schools?key=${SIS_API_KEY}`;
         const allSchools = await axios.get(allSchoolsURL);
         const schools = allSchools.data;
@@ -46,4 +55,4 @@ const refreshClassList = async () => {
     }
 };
 
-refreshClassList();
+module.exports = refreshClassList;

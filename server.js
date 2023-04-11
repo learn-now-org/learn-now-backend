@@ -99,4 +99,11 @@ app.get("/", (req, res) => {
     res.send("Welcome to the Learn Now API!");
 }); 
 
+const refreshClassList = require("./classRefresh");
+
+app.post("/refresh", (req, res) => {
+  refreshClassList();
+  res.send("Refreshed class list");
+});
+
 module.exports = app;
