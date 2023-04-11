@@ -1,5 +1,25 @@
 const express = require('express');
+
 const app = express();
+
+const bodyParser = require("body-parser");
+const swaggerJsdoc = require("swagger-jsdoc");
+const swaggerUi = require("swagger-ui-express");
+
+const swaggerDefinition = require("./swagger.json");
+
+const options = {
+  swaggerDefinition,
+  apis: ['./routes/*.js'],
+};
+
+const specs = swaggerJsdoc(options);
+app.use(
+  "/docs",
+  swaggerUi.serve,
+  swaggerUi.setup(specs, { explorer: true })
+);
+
 const cors = require("cors");
 const helmet = require("helmet");
 require("dotenv").config({ path: "./.env" })
