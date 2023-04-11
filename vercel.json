@@ -1,5 +1,11 @@
 {
     "version": 2,
     "builds": [{ "src": "server.js", "use": "@vercel/node" }],
-    "routes": [{ "src": "(.*)", "dest": "server.js" }]
+    "routes": [{ "src": "(.*)", "dest": "server.js" }],
+    "github": {
+      "enabled": true,
+      "autoAlias": true,
+      "autoAliasDelay": 60,
+      "autoAliasScope": "staging"
+    }
   }

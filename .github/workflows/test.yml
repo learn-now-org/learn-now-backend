@@ -1,0 +1,25 @@
+name: Run Unit Tests using Jest
+
+on:
+  push:
+    branches: 
+      - main
+      - dev
+  pull_request:
+    branches: 
+      - main
+      - dev
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16
+          cache: 'npm'
+      - run: npm ci
+      - run: npm test
+
+      
