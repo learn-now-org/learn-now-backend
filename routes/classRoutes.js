@@ -15,6 +15,10 @@ const router = express.Router();
 
 router.get("/search", async (req, res) => {
     try {
+        if (req.query.limit == null) {
+            req.query.limit = 20;
+        }
+        const limit = Number(req.query.limit);
         const result = await classModel.aggregate([
             {
                 $search: {
@@ -29,7 +33,7 @@ router.get("/search", async (req, res) => {
                 }
             },
             {
-              $limit: 10
+                $limit: limit
             }
         ]);
         res.json(result);
