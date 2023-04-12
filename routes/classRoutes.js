@@ -13,9 +13,6 @@ const express = require("express");
 const classModel = require("../models/classModel");
 const router = express.Router();
 
-
-
-
 router.get("/search", async (req, res) => {
     try {
         const result = await classModel.aggregate([
@@ -73,13 +70,26 @@ router.get("/search", async (req, res) => {
  */
 router.get("/", async (req, res) => {
     try {
-        const classes = await classModel.find();
+        const limit = req.query.limit;
+        const offset = req.query.offset;
+        const classes = await classModel.find().limit(limit).skip(offset);
         res.json(classes);
     } catch (err) {
         res.status(500).json({ message: err.message });
     }
-}
-);
+});
+
+router.get("/batch/", async (req, res) => {
+  try {
+    const reqBody = req.body;
+    console.log(reqBody);
+    const classes = await classModel.find({ _id: { $in: reqBody } });
+    res.json(classes);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
 
 /**
  * GET /classes/{id}
